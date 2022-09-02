@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MenuController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,13 +15,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 // Public routes
 Route::get('/menus', [MenuController::class, 'index']);
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/signup', [AuthController::class, 'sign_up']);
+Route::post('/login', [AuthController::class, 'login']);
 
 //Protected routes-Only authenticated users can have access to protected routes//
 Route::group(['middleware' => ['auth:sanctum']], function () {
