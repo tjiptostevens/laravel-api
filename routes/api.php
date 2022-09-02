@@ -21,3 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/menus', [MenuController::class, 'store']);
+Route::get('/menus', [MenuController::class, 'index']);
