@@ -6,35 +6,55 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     public function sign_up(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confirmed'
+        // $data = $request->validate([
+        //     'name' => 'required|string',
+        //     'email' => 'required|string|unique:users,email',
+        //     'password' => 'required|string|confirmed'
 
 
-        ]);
+        // ]);
 
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password'])
+        // $user = User::create([
+        //     'name' => $data['name'],
+        //     'email' => $data['email'],
+        //     'password' => bcrypt($data['password'])
 
-        ]);
+        // ]);
 
-        $token = $user->createToken('apiToken')->plainTextToken;
+        $rules = [
+            'name' => 'unique:users|required',
+            'email'    => 'unique:users|required',
+            'password' => 'required',
+        ];
 
-        $response = [
+        $input     = $request->only('name', 'email', 'password');
+        $validator = Validator::make($input, $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'error' => $validator->messages()
+            ]);
+        }
+        $name = $request->name;
+        $email    = $request->email;
+        $password = $request->password;
+        $user     = User::create(['name' => $name, 'email' => $email, 'password' => Hash::make($password)]);
+        $token    = $user->createToken('apiToken')->plainTextToken;
+
+        $res = [
             'user' => $user,
             'token' => $token
 
         ];
 
-        return response($response, 201);
+        return response($res, 201);
     }
     public function login(Request $request)
     {
@@ -59,7 +79,7 @@ class AuthController extends Controller
             'token' => $token
         ];
 
-        return response($res, 201);
+        return response($res, 200);
     }
 
     public function logout(Request $request)
